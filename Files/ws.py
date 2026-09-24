@@ -1,25 +1,19 @@
-#!/usr/bin/env python3
+import socket, threading, select, signal, sys, time, getopt
 
-import sys
-import time
-import select
-import signal
-import getopt
-import socket
-import threading
-
+# Listen
 LISTENING_ADDR = '0.0.0.0'
-
 if sys.argv[1:]:
     LISTENING_PORTS = [int(port) for port in sys.argv[1].split(',')]
 else:
     LISTENING_PORTS = [10015]
-
+# Passwd
 PASS = ''
+
+# CONST
 BUFLEN = 4096 * 4
 TIMEOUT = 60
 DEFAULT_HOSTS = ['127.0.0.1:109', '127.0.0.1:2223', '127.0.0.1:2222', '127.0.0.1:1194']
-RESPONSE = 'HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: foo\r\n\r\n'
+RESPONSE = 'HTTP/1.1 101 Switching Protocol\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: foo\r\n\r\n'
 
 class Server(threading.Thread):
     def __init__(self, host, ports):
@@ -89,6 +83,7 @@ class Server(threading.Thread):
                 c.close()
         finally:
             self.threadsLock.release()
+
 
 class ConnectionHandler(threading.Thread):
     def __init__(self, socClient, server, addr):
@@ -223,6 +218,7 @@ class ConnectionHandler(threading.Thread):
             if error:
                 break
 
+
 def print_usage():
     print('Usage: proxy.py -p <port1,port2,...>')
     print('       proxy.py -b <bindAddr> -p <port1,port2,...>')
@@ -246,6 +242,7 @@ def parse_args(argv):
         elif opt in ("-p", "--port"):
             LISTENING_PORTS = [int(port) for port in arg.split(',')]
 
+
 def main(host=LISTENING_ADDR, ports=LISTENING_PORTS):
     print("\n:-------PythonProxy-------:\n")
     print("Listening addr: " + LISTENING_ADDR)
@@ -261,6 +258,6 @@ def main(host=LISTENING_ADDR, ports=LISTENING_PORTS):
             server.close()
             break
 
+#######    parse_args(sys.argv[1:])
 if __name__ == '__main__':
     main()
-    
